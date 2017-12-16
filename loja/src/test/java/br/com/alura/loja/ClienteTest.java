@@ -22,10 +22,12 @@ import br.com.alura.loja.modelo.Projeto;
 public class ClienteTest {
 
 	private HttpServer server;
+	private Client client;
 
 	@Before
 	public void startServer() {
 		server = Servidor.inicializaServidor();
+		this.client = ClientBuilder.newClient();
 	}
 
 	@After
@@ -35,7 +37,6 @@ public class ClienteTest {
 
 	@Test
 	public void testaQueAConexaoComOServidorFunciona() {
-		Client client = ClientBuilder.newClient();
 		WebTarget target = client.target("http://www.mocky.io");
 		String conteudo = target.path("/v2/52aaf5deee7ba8c70329fb7d").request().get(String.class);
 		System.out.println(conteudo);
@@ -45,7 +46,6 @@ public class ClienteTest {
 
 	@Test
 	public void testaQueAConexaoComOServidorFuncionaNoPathDeProjetos() {
-		Client client = ClientBuilder.newClient();
 		WebTarget target = client.target("http://localhost:8080");
 		String conteudo = target.path("/projetos/1").request().get(String.class);
 		Assert.assertTrue(conteudo.contains("<nome>Minha loja"));
@@ -54,7 +54,6 @@ public class ClienteTest {
 
 	@Test
 	public void testaQueBuscarUmCarrinhoTrazOCarrinhoEsperado() {
-		Client client = ClientBuilder.newClient();
 		WebTarget target = client.target("http://localhost:8080");
 		String conteudo = target.path("/carrinhos/1").request().get(String.class);
 		Carrinho carrinho = (Carrinho) new XStream().fromXML(conteudo);
@@ -64,29 +63,30 @@ public class ClienteTest {
 
 	@Test
 	public void testaQueRetornaUmCarrinho() {
-		Client client = ClientBuilder.newClient();
 		WebTarget target = client.target("http://localhost:8080");
 		String conteudo = target.path("/projetos/1").request().get(String.class);
 		Projeto projeto = (Projeto) new XStream().fromXML(conteudo);
 
 		Assert.assertEquals(1, projeto.getId());
 	}
-	
+
 	@Test
 	public void enviaUmCarrinhoViaPost() {
-		Client client = ClientBuilder.newClient();
 		WebTarget target = client.target("http://localhost:8080");
-		
+
 		Carrinho carrinho = new Carrinho();
 		carrinho.adiciona(new Produto(314L, "Tablet", 999, 1));
 		carrinho.setRua("Rua vergueiro");
 		carrinho.setCidade("São Paulo");
 		String xml = carrinho.toXML();
-		
+
 		Entity<String> entity = Entity.entity(xml, MediaType.APPLICATION_XML);
-		
+
 		Response response = target.path("/carrinhos").request().post(entity);
-		Assert.assertEquals("<status>Sucesso</status>", response.readEntity(String.class));
-		
+		Assert.assertEquals(201, response.getStatus());
+
+		String location = response.getHeaderString("Location");
+		String conteudo = client.target(location).request().get(String.class);
+		Assert.assertTrue(conteudo.contains("Tablet"));
 	}
 }
