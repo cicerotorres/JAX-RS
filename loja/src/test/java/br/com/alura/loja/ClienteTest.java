@@ -71,9 +71,9 @@ public class ClienteTest {
 	@Test
 	public void testaQueRetornaUmCarrinho() {
 		// WebTarget target = client.target("http://localhost:8080");
-		String conteudo = target.path("/projetos/1").request().get(String.class);
-		Projeto projeto = (Projeto) new XStream().fromXML(conteudo);
-
+		// String conteudo = target.path("/projetos/1").request().get(String.class);
+		// Projeto projeto = (Projeto) new XStream().fromXML(conteudo);
+		Projeto projeto = target.path("/projetos/1").request().get(Projeto.class);
 		Assert.assertEquals(1, projeto.getId());
 	}
 
@@ -95,5 +95,18 @@ public class ClienteTest {
 		String location = response.getHeaderString("Location");
 		String conteudo = client.target(location).request().get(String.class);
 		Assert.assertTrue(conteudo.contains("Tablet"));
+	}
+	
+	@Test
+	public void enviaUmProjetoViaPostJAXB() {
+		Projeto projeto = new Projeto(3,"ProjetoPostJAXB",2017);
+		Entity<Projeto> entity = Entity.entity(projeto, MediaType.APPLICATION_XML);
+		
+		Response response = target.path("/projetos").request().post(entity);
+		Assert.assertEquals(201, response.getStatus());
+		
+		String location = response.getHeaderString("Location");
+		Projeto projetoRetorno = client.target(location).request().get(Projeto.class);
+		Assert.assertEquals("ProjetoPostJAXB",projetoRetorno.getNome());
 	}
 }

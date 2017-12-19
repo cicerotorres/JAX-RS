@@ -23,19 +23,19 @@ public class ProjetoResource {
 	@Path("{id}")
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
-	public String busca(@PathParam("id") long id) {
+	public Projeto busca(@PathParam("id") long id) {
 		Projeto projetos = new ProjetoDAO().busca(id);
-		return projetos.toXML();
+		return projetos; 
 	}
 
-	@POST
-	@Consumes(MediaType.APPLICATION_XML)
-	public Response adiciona(String conteudo) {
-		Projeto projeto = (Projeto) new XStream().fromXML(conteudo);
-		new ProjetoDAO().adiciona(projeto);
-		URI uri = URI.create("/projetos/" + projeto.getId());
-		return Response.created(uri).build();
-	}
+//	@POST
+//	@Consumes(MediaType.APPLICATION_XML)
+//	public Response adiciona(String conteudo) {
+//		Projeto projeto = (Projeto) new XStream().fromXML(conteudo);
+//		new ProjetoDAO().adiciona(projeto);
+//		URI uri = URI.create("/projetos/" + projeto.getId());
+//		return Response.created(uri).build();
+//	}
 	
 	@Path("{id}")
 	@DELETE
@@ -43,4 +43,14 @@ public class ProjetoResource {
 		new ProjetoDAO().remove(id);		
 		return Response.ok().build();
 	}
+	
+	@POST
+	@Consumes(MediaType.APPLICATION_XML)
+	public Response adicionaProjetoJAXB(Projeto projeto) {
+		new ProjetoDAO().adiciona(projeto);
+		URI uri = URI.create("/projetos/" + projeto.getId());
+		return Response.created(uri).build();
+	}
+	
+	
 }
