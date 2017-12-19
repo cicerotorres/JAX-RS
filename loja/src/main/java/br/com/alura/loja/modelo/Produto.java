@@ -1,6 +1,8 @@
 package br.com.alura.loja.modelo;
 
-
+//Para utilizar com JAXB
+//@XmlRootElement
+//@XmlAccessorType(XmlAccessType.FIELD)
 public class Produto {
 
 	private double preco;
@@ -14,7 +16,11 @@ public class Produto {
 		this.preco = preco;
 		this.quantidade = quantidade;
 	}
-
+	
+	public Produto() {
+		
+	}
+	
 	public double getPreco() {
 		return preco;
 	}
