@@ -27,15 +27,6 @@ public class ProjetoResource {
 		Projeto projetos = new ProjetoDAO().busca(id);
 		return projetos; 
 	}
-
-//	@POST
-//	@Consumes(MediaType.APPLICATION_XML)
-//	public Response adiciona(String conteudo) {
-//		Projeto projeto = (Projeto) new XStream().fromXML(conteudo);
-//		new ProjetoDAO().adiciona(projeto);
-//		URI uri = URI.create("/projetos/" + projeto.getId());
-//		return Response.created(uri).build();
-//	}
 	
 	@Path("{id}")
 	@DELETE
